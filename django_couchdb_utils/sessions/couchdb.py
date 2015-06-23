@@ -31,16 +31,12 @@ class SessionStore(SessionBase):
         session = Session.get_session(self.session_key)
         if must_create and session:
             raise CreateError
-        if must_create:
+        if must_create or not session:
             session = Session()
             session.session_key = self.session_key
-            session.session_data = self.encode(self._get_session(no_load=must_create))
-            session.expire_date = self.get_expiry_date()
-        else:
-            if not session:
-                return None
-            session.session_data = self.encode(self._get_session(no_load=must_create))
-            session.expire_date = self.get_expiry_date()
+            
+        session.session_data = self.encode(self._get_session(no_load=must_create))
+        session.expire_date = self.get_expiry_date()
         session.save()
 
     def exists(self, session_key):
